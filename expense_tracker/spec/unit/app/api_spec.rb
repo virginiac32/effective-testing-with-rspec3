@@ -16,26 +16,31 @@ module ExpenseTracker
     let(:expense) { { 'some' => 'data' } }
 
     describe 'POST /expenses' do
-      context 'when the expense is successfully recorded' do
+      context 'when the input format is JSON' do
         before do
-          allow(ledger).to receive(:record)
-            .with(expense)
-            .and_return(RecordResult.new(true, 417, nil))
+          # header('Content-Type', 'text/json')
         end
 
-        it 'returns the expense id' do
-          post '/expenses', JSON.generate(expense)
+        context 'when the expense is successfully recorded' do
+          before do
+            allow(ledger).to receive(:record)
+              .with(expense)
+              .and_return(RecordResult.new(true, 417, nil))
+          end
 
-          expect(response_body).to include('expense_id' => 417)
+          it 'returns the expense id' do
+            post '/expenses', JSON.generate(expense)
+
+            expect(response_body).to include('expense_id' => 417)
+          end
+
+          it 'responds with a 200 (OK)' do
+            post '/expenses', JSON.generate(expense)
+            expect(last_response.status).to eq(200)
+          end
         end
 
-        it 'responds with a 200 (OK)' do
-          post '/expenses', JSON.generate(expense)
-          expect(last_response.status).to eq(200)
-        end
-      end
-
-      context 'when the expense fails validation' do
+        context 'when the expense fails validation' do
         before do
           allow(ledger).to receive(:record)
             .with(expense)
@@ -51,10 +56,28 @@ module ExpenseTracker
           post '/expenses', JSON.generate(expense)
           expect(last_response.status).to eq(422)
         end
+        end
+      end
+
+      context 'when the input format is XML' do
+        context 'when the expense is successfully recorded'
+        context 'when the expense fails validation'
+      end
+
+      context 'when the input format is unsupported' do
+
+      end
+
+      context 'when the input format does not match the advertised format' do
+
       end
     end
 
     describe 'GET /expenses/:date' do
+      before do
+        # header('Content-Type', 'text/json')
+      end
+
       context 'when the expenses exist on the given date' do
         before do
           allow(ledger).to receive(:expenses_on)

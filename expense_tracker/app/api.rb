@@ -22,6 +22,9 @@ module ExpenseTracker
     end
 
     get '/expenses/:date' do
+      type = request.media_type
+      puts type
+
       JSON.generate(@ledger.expenses_on(params[:date]))
     end
   end
